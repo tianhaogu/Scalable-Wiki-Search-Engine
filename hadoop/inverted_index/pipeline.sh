@@ -30,7 +30,7 @@ rm -rf output output[0-9]
 # Job 0: Document Count (this job is not part of the pipeline)
 hadoop \
   jar ../hadoop-streaming-2.7.2.jar \
-  -input ${PIPELINE_INPUT} \
+  -input input \
   -output output0 \
   -mapper ./map0.py \
   -reducer ./reduce0.py
@@ -41,7 +41,7 @@ cp output0/part-00000 total_document_count.txt
 # Job 1
 hadoop \
   jar ../hadoop-streaming-2.7.2.jar \
-  -input ${PIPELINE_INPUT} \
+  -input input \
   -output output1 \
   -mapper ./map1.py \
   -reducer ./reduce1.py
@@ -53,6 +53,15 @@ hadoop \
   -output output2 \
   -mapper ./map2.py \
   -reducer ./reduce2.py
+
+# Job 3
+hadoop \
+  jar ../hadoop-streaming-2.7.2.jar \
+  -input output2 \
+  -output output \
+  -mapper ./map3.py \
+  -numReduceTasks 3 \
+  -reducer ./reduce3.py
 
 # REMINDER: don't forget to set -numReduceTasks in your last stage.  You'll
 # need this to generate the correct number of inverted index segments.
