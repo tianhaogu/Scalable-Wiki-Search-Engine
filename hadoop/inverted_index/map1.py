@@ -31,9 +31,15 @@ def parse_text(doc_id, doc_title, doc_body):
 
 
 for line in sys.stdin:
-    doc_id = line.split(",")[0]
-    doc_id = re.sub(r"[^a-zA-Z0-9 ]+", "", doc_id)
-    doc_id = int(doc_id)
-    doc_title = line.split(",")[1]
-    doc_body = line.split(",")[2]
+    # doc_id = line.split(",")[0]
+    # doc_id = re.sub(r"[^a-zA-Z0-9 ]+", "", doc_id)
+    # doc_id = int(doc_id)
+    # doc_title = line.split(",")[1]
+    # doc_body = line.split(",")[2]
+    # parse_text(doc_id, doc_title, doc_body)
+    doc_raw = csv.reader([line])
+    doc_info = list(doc_raw)
+    doc_id = doc_info[0][0]
+    doc_title = doc_info[0][1]
+    doc_body = doc_info[0][2]
     parse_text(doc_id, doc_title, doc_body)

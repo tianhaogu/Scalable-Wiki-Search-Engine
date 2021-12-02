@@ -31,11 +31,8 @@ def reduce_one_group(key, group):
 def integrate_group(key, group):
     term_list = []
     for line in group:
-        # info_per_doc_obj = line.partition("\t")[2]
-        # info_per_doc_dict = json.loads(info_per_doc_obj)
         info_per_doc_dict = line
         info_per_doc_dict.pop("w_ik", None)
-        # info_per_doc_dict["norm"] = TOTAL_NORM_PER_DOC[key]
         term_list.append(info_per_doc_dict)
     output_per_doc = {
         "norm": TOTAL_NORM_PER_DOC[key],

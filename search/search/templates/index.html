@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ask485</title>
+    <link rel="stylesheet" type="test/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+</head>
+
+<body>
+    <div class="feed">
+        <div class="ask485">
+            <h3>ask485?</h3>
+        </div>
+        <div class="search_bar">
+            <form action="/" method="GET">
+                <div><input type="text" name="q" value="" /></div>
+                <div><input type="range" name="w" min='0' max="1" /></div>
+                <input type="submit" value="Search"/>
+            </form>
+        </div>
+        <div class="pagerank_weight">
+            Pagerank Weight
+        </div>
+        <div class="docs"></div>
+    </div>
+</body>
+
+</html>

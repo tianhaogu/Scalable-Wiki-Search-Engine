@@ -2,30 +2,23 @@
 """
 
 Reduce 3.
-reduced_id1  {term1: {"idf_k": num, "term_info_appear": [{"doc_id": int, "tf_ik": int, "norm": num}, {}]}, term2: {  }, ...}.
-reduced_id2  {term1: {"idf_k": num, "term_info_appear": [{"doc_id": int, "tf_ik": int, "norm": num}, {}]}, term4: {  }, ...}.
+reduced_id1  {term1: {"idf_k": num, "term_info_appear": [{"doc_id": str, "tf_ik": int, "norm": num}, {}]}, term2: {  }, ...}.
+reduced_id2  {term1: {"idf_k": num, "term_info_appear": [{"doc_id": str, "tf_ik": int, "norm": num}, {}]}, term4: {  }, ...}.
 """
 import sys
 import json
 import itertools
 
 
-# def output_one_group(current_file_terms, output_file):
-#     for term, term_info in current_file_terms.items():
-#         idf_k = term_info["idf_k"]
-#         appear_str_list = []
-#         for new_term_dict in term_info["term_info_appear"]:
-#             current_str = ' '.join(new_term_dict.values())
-#             appear_str_list.append(current_str)
-#         all_appear_str = ' '.join(appear_str_list)
-#         print(f"{term} {idf_k} {all_appear_str}")
-
-
 def output_one_group(current_file_terms_sorted, output_file):
     for (term, term_info) in current_file_terms_sorted:
         idf_k = term_info["idf_k"]
         appear_str_list = []
-        for new_term_dict in term_info["term_info_appear"]:
+        term_info_appear_list = term_info["term_info_appear"]
+        term_info_appear_list_sorted = sorted(
+            term_info_appear_list, key=lambda dict: dict["doc_id"]
+        )
+        for new_term_dict in term_info_appear_list_sorted:
             current_str = ' '.join(new_term_dict.values())
             appear_str_list.append(current_str)
         all_appear_str = ' '.join(appear_str_list)
