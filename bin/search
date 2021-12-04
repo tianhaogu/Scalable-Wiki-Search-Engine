@@ -10,75 +10,51 @@ usage() {
     echo "Usage: $0 (start|stop|restart|status)"
 }
 
-if [ $# -ne 1]; then
+if [ $# -ne 1 ]; then
     usage
     exit 1
 fi
 
 case $1 in
     "start")
-        echo "starting index server ..."
-        mkdir -p var/log
-        rm -f var/log/index.log
-        if pgrep -f "flask run --host 0.0.0.0 --port 9000"
-            echo "Error: index server 9000 is already running"
+        set +o pipefail
+        NPROCS1=$(pgrep -f "flask run --host 0.0.0.0 --port 900[0-2]" | wc -l)
+        NPROCS2=$(pgrep -f "flask run --host 0.0.0.0 --port 8000" | wc -l)
+        set -o pipefail
+        if [ "$NPROCS1" -ne 3 ]; then
+            echo "Error: index server is not running"
+            echo "Try ./bin/index start"
+            exit 2
+        elif [ "$NPROCS2" -eq 1 ]; then
+            echo "Error: search server is already running"
+            exit 3
         else
-            FLASK_APP=index INDEX_PATH="inverted_index_0.txt" flask run --host 0.0.0.0 --port 9000 >> var/log/index.log 2>&1 &
-        fi
-        if pgrep -f "flask run --host 0.0.0.0 --port 9001"
-            echo "Error: index server 9001 is already running"
-        else
-            FLASK_APP=index INDEX_PATH="inverted_index_1.txt" flask run --host 0.0.0.0 --port 9001 >> var/log/index.log 2>&1 &
-        fi
-        if pgrep -f "flask run --host 0.0.0.0 --port 9002"
-            echo "Error: index server 9002 is already running"
-        else
-            FLASK_APP=index INDEX_PATH="inverted_index_2.txt" flask run --host 0.0.0.0 --port 9002 >> var/log/index.log 2>&1 &
+            echo "starting search server ..."
+            mkdir -p var/log
+            rm -f var/log/search.log
+            FLASK_APP=search flask run --host 0.0.0.0 --port 8000 &> var/log/search.log &
         fi
         ;;
     "stop")
-        echo "stopping index server ..."
-        pkill -f "flask run --host 0.0.0.0 --port 9000" || true
-        pkill -f "flask run --host 0.0.0.0 --port 9001" || true
-        pkill -f "flask run --host 0.0.0.0 --port 9002" || true
+        echo "stopping search server ..."
+        pkill -f 'flask run --host 0.0.0.0 --port 8000' || true
         ;;
     "restart")
-        echo "stopping index server ..."
-        pkill -f "flask run --host 0.0.0.0 --port 9000" || true
-        pkill -f "flask run --host 0.0.0.0 --port 9001" || true
-        pkill -f "flask run --host 0.0.0.0 --port 9002" || true
-        echo "starting index server ..."
+        echo "stopping search server ..."
+        pkill -f 'flask run --host 0.0.0.0 --port 8000' || true
+        echo "starting search server ..."
         mkdir -p var/log
-        rm -f var/log/index.log
-        if pgrep -f "flask run --host 0.0.0.0 --port 9000"
-            echo "Error: index server 9000 is already running"
-        else
-            FLASK_APP=index INDEX_PATH="inverted_index_0.txt" flask run --host 0.0.0.0 --port 9000 >> var/log/index.log 2>&1 &
-        fi
-        if pgrep -f "flask run --host 0.0.0.0 --port 9001"
-            echo "Error: index server 9001 is already running"
-        else
-            FLASK_APP=index INDEX_PATH="inverted_index_1.txt" flask run --host 0.0.0.0 --port 9001 >> var/log/index.log 2>&1 &
-        fi
-        if pgrep -f "flask run --host 0.0.0.0 --port 9002"
-            echo "Error: index server 9002 is already running"
-        else
-            FLASK_APP=index INDEX_PATH="inverted_index_2.txt" flask run --host 0.0.0.0 --port 9002 >> var/log/index.log 2>&1 &
-        fi
+        rm -f var/log/search.log
+        FLASK_APP=search flask run --host 0.0.0.0 --port 8000 &> var/log/search.log &
         ;;
     "status")
-        set +o pipefail
-        NPROCS=$(pgrep -f "flask run --host 0.0.0.0 --port 900[0-2]" | wc -l)
-        set -o pipefail
-        if [ "$NPROCS" -eq 3 ]; then
-            echo "index server running"
-            exit
-        elif [ "$NPROCS" -eq 0 ]; then
-            echo "index server stopped"
+        NPROCS3=$(pgrep -f "flask run --host 0.0.0.0 --port 8000" | wc -l)
+        if [ "$NPROCS3" -eq 0 ]; then
+            echo "search server stopped"
             exit 1
         else
-            echo "index server error: found ${NPROCS} processes, expected 3"
-            exit 2
+            echo "search server running"
+            exit 0
         fi
         ;;
     *)

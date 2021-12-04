@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>ask485</title>
-    <link rel="stylesheet" type="test/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 </head>
@@ -12,12 +12,12 @@
 <body>
     <div class="feed">
         <div class="ask485">
-            <h3>ask485?</h3>
+            ask485?
         </div>
         <div class="search_bar">
             <form action="/" method="GET">
                 <div><input type="text" name="q" value="{{ query }}" /></div>
-                <div><input type="range" name="w" min='0' max="1" value="{{ weight }}" /></div>
+                <div><input type="range" name="w" min='0' max="1" step="0.01" value="{{ weight }}" /></div>
                 <input type="submit" value="Search"/>
             </form>
         </div>
@@ -40,9 +40,11 @@
                     {% endif %}
                 {% endfor %}
             {% else %}
-                <div class="no_results">
-                    No search results found!
-                </div>
+                {% if query %}
+                    <div class="no_results">
+                        No search results found!
+                    </div>
+                {% endif %}
             {% endif %}
         </div>
     </div>
