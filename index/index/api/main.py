@@ -10,6 +10,7 @@ STOPWORDS_SET = set()
 PAGERANK_DICT = {}
 INVERTEDINDEX_DICT = {}
 
+
 @index.app.before_first_request
 def startup():
     """Load inverted index, pagerank, and stopwords into memory."""
@@ -22,7 +23,7 @@ def startup():
 def read_stopwords(index_dir):
     """Read the stopwords.txt file."""
     stopwords_file = index_dir / "stopwords.txt"
-    with open(str(stopwords_file), 'r') as stopfile:
+    with open(str(stopwords_file), 'r', encoding='utf-8') as stopfile:
         for line in stopfile:
             STOPWORDS_SET.add(line.strip())
 
@@ -30,7 +31,7 @@ def read_stopwords(index_dir):
 def read_pagerank(index_dir):
     """Read the pagerank.out file."""
     pagerank_file = index_dir / "pagerank.out"
-    with open(str(pagerank_file), 'r') as pagerankfile:
+    with open(str(pagerank_file), 'r', encoding='utf-8') as pagerankfile:
         for line in pagerankfile:
             line = line.strip()
             doc_id, score = line.split(",")
@@ -41,7 +42,7 @@ def read_inverted_index(index_dir):
     """Read the inverted_index.txt file, based on the configured envvar."""
     index_file_config = index.app.config["INDEX_PATH"]
     inverted_index_file = index_dir / "inverted_index" / index_file_config
-    with open(str(inverted_index_file), 'r') as indexfile:
+    with open(str(inverted_index_file), 'r', encoding='utf-8') as indexfile:
         for line in indexfile:
             term_info_list = line.strip().split()
             term_name = term_info_list[0]
@@ -76,7 +77,7 @@ def get_index():
 @index.app.route('/api/v1/hits/', methods=["GET"])
 def get_hits():
     """Return hits based on the query."""
-    queries = request.query_string.decode('utf-8')
+    # queries = request.query_string.decode('utf-8')
     query = request.args.get("q", default='', type=str)
     weight = request.args.get("w", default=0.5, type=float)
     query_list = process_query(query)
@@ -103,9 +104,9 @@ def process_query(query):
     query = query.strip().casefold()
     query_list = query.split()
     query_list_nostop = []
-    for query in query_list:
-        if query not in STOPWORDS_SET:
-            query_list_nostop.append(query)
+    for curr_query in query_list:
+        if curr_query not in STOPWORDS_SET:
+            query_list_nostop.append(curr_query)
     return query_list_nostop
 
 
@@ -133,7 +134,7 @@ def get_documents(query_list):
                     term_dict_context = {
                         # "idf_k": term_dict["idf_k"],
                         "tf_ik": term_appear_dict["tf_ik"],
-                        "norm": term_appear_dict["norm"] 
+                        "norm": term_appear_dict["norm"]
                     }
             document_dict[query] = term_dict_context
         documents_contain[doc_id] = document_dict
@@ -145,7 +146,7 @@ def rank_documents(query_list, documents_contain, weight):
     overall_score_list = []
     for doc_id, document_dict in documents_contain.items():
         pagerank_score = calculate_pagerank_score(doc_id)
-        tfidf_score = calculate_tfidf_score(query_list, doc_id, document_dict)
+        tfidf_score = calculate_tfidf_score(query_list, document_dict)
         weightd_score = weight * pagerank_score + (1 - weight) * tfidf_score
         overall_score_list.append((doc_id, weightd_score))
     ranked_score_list = sorted(overall_score_list, key=lambda x: (-x[1], x[0]))
@@ -158,7 +159,7 @@ def calculate_pagerank_score(doc_id):
     return pagerank_score
 
 
-def calculate_tfidf_score(query_list, doc_id, document_dict):
+def calculate_tfidf_score(query_list, document_dict):
     """Calculate tf-idf score."""
     query_vector = []
     document_vector = []

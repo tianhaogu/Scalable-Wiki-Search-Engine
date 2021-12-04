@@ -1,8 +1,8 @@
 """Search Server main code."""
 import threading
-import requests
 import heapq
-from flask import (jsonify, request, render_template)
+import requests
+from flask import (request, render_template)
 import search
 
 
@@ -32,8 +32,8 @@ def get_search():
     search_context = {
         "top_ten_docs": top_ten_docs_info,
         "query": query,
-        "weight": weight if weight not in (0.0, 1.0) \
-                else '0' if weight == 0.0 else '1'
+        "weight": weight if weight not in (0.0, 1.0)
+        else '0' if weight == 0.0 else '1'
     }
     search.app.config["HIT_CONTEXT_LIST"].clear()
     return render_template("index.html", **search_context)
@@ -44,7 +44,7 @@ def generate_urls(query, weight):
     queries = query.split()
     final_query = '+'.join(queries)
     url_postfix = f"?q={final_query}&w={weight}" if weight \
-            else f"?q={final_query}"
+        else f"?q={final_query}"
     search_api_urls = search.app.config["SEARCH_INDEX_SEGMENT_API_URLS"]
     url_list = [(url_prefix + url_postfix) for url_prefix in search_api_urls]
     return url_list

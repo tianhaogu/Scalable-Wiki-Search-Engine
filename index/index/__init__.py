@@ -10,4 +10,3 @@ app.config["EMPTY_HITS"] = {"hits": []}
 
 # Tell our app about api and inverted_index.
 import index.api  # noqa: E402  pylint: disable=wrong-import-position
-# import index.inverter_index
