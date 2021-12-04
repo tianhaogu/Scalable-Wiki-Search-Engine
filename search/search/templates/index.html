@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+    
 <head>
     <meta charset="UTF-8">
     <title>ask485</title>
@@ -15,15 +16,35 @@
         </div>
         <div class="search_bar">
             <form action="/" method="GET">
-                <div><input type="text" name="q" value="" /></div>
-                <div><input type="range" name="w" min='0' max="1" /></div>
+                <div><input type="text" name="q" value="{{ query }}" /></div>
+                <div><input type="range" name="w" min='0' max="1" value="{{ weight }}" /></div>
                 <input type="submit" value="Search"/>
             </form>
         </div>
         <div class="pagerank_weight">
             Pagerank Weight
         </div>
-        <div class="docs"></div>
+        <div class="docs">
+            {% if top_ten_docs %}
+                {% for curr_doc in top_ten_docs %}
+                    {% if curr_doc.url %}
+                        <a class="doc_url">{{ curr_doc.url }}</a>
+                    {% else %}
+                        <a class="doc_url">No url available</a>
+                    {% endif %}
+                    <div class="doc_title">{{ curr_doc.title }}</div>
+                    {% if curr_doc.summary %}
+                        <div class="doc_summary">{{ curr_doc.summary }}</div>
+                    {% else %}
+                        <div class="doc_summary">No summary available</div>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <div class="no_results">
+                    No search results found!
+                </div>
+            {% endif %}
+        </div>
     </div>
 </body>
 

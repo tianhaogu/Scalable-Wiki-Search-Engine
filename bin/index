@@ -10,30 +10,20 @@ usage() {
     echo "Usage: $0 (start|stop|restart|status)"
 }
 
-if [ $# -ne 1]; then
+if [ $# -ne 1 ]; then
     usage
     exit 1
 fi
 
+DATABASE=search/search/var/index.sqlite3
+
 case $1 in
     "start")
-        echo "starting index server ..."
-        mkdir -p var/log
-        rm -f var/log/index.log
-        if pgrep -f "flask run --host 0.0.0.0 --port 9000"
-            echo "Error: index server 9000 is already running"
+        if [ -f "$DATABASE" ]; then
+            echo "Error: can't find search database search/search/var/index.sqlite3"
+            echo "Try: ./bin/indexdb create"
+            exit 1
         else
-            FLASK_APP=index INDEX_PATH="inverted_index_0.txt" flask run --host 0.0.0.0 --port 9000 >> var/log/index.log 2>&1 &
-        fi
-        if pgrep -f "flask run --host 0.0.0.0 --port 9001"
-            echo "Error: index server 9001 is already running"
-        else
-            FLASK_APP=index INDEX_PATH="inverted_index_1.txt" flask run --host 0.0.0.0 --port 9001 >> var/log/index.log 2>&1 &
-        fi
-        if pgrep -f "flask run --host 0.0.0.0 --port 9002"
-            echo "Error: index server 9002 is already running"
-        else
-            FLASK_APP=index INDEX_PATH="inverted_index_2.txt" flask run --host 0.0.0.0 --port 9002 >> var/log/index.log 2>&1 &
         fi
         ;;
     "stop")
@@ -50,21 +40,9 @@ case $1 in
         echo "starting index server ..."
         mkdir -p var/log
         rm -f var/log/index.log
-        if pgrep -f "flask run --host 0.0.0.0 --port 9000"
-            echo "Error: index server 9000 is already running"
-        else
-            FLASK_APP=index INDEX_PATH="inverted_index_0.txt" flask run --host 0.0.0.0 --port 9000 >> var/log/index.log 2>&1 &
-        fi
-        if pgrep -f "flask run --host 0.0.0.0 --port 9001"
-            echo "Error: index server 9001 is already running"
-        else
-            FLASK_APP=index INDEX_PATH="inverted_index_1.txt" flask run --host 0.0.0.0 --port 9001 >> var/log/index.log 2>&1 &
-        fi
-        if pgrep -f "flask run --host 0.0.0.0 --port 9002"
-            echo "Error: index server 9002 is already running"
-        else
-            FLASK_APP=index INDEX_PATH="inverted_index_2.txt" flask run --host 0.0.0.0 --port 9002 >> var/log/index.log 2>&1 &
-        fi
+        FLASK_APP=index INDEX_PATH="inverted_index_0.txt" flask run --host 0.0.0.0 --port 9000 >> var/log/index.log 2>&1 &
+        FLASK_APP=index INDEX_PATH="inverted_index_1.txt" flask run --host 0.0.0.0 --port 9001 >> var/log/index.log 2>&1 &
+        FLASK_APP=index INDEX_PATH="inverted_index_2.txt" flask run --host 0.0.0.0 --port 9002 >> var/log/index.log 2>&1 &
         ;;
     "status")
         set +o pipefail
