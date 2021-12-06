@@ -149,7 +149,9 @@ def rank_documents(query_list, documents_contain, weight):
         tfidf_score = calculate_tfidf_score(query_list, document_dict)
         weightd_score = weight * pagerank_score + (1 - weight) * tfidf_score
         overall_score_list.append((doc_id, weightd_score))
-    ranked_score_list = sorted(overall_score_list, key=lambda x: (-x[1], x[0]))
+    ranked_score_list = sorted(
+        overall_score_list, key=lambda x: (-x[1], int(x[0]))
+    )
     return ranked_score_list
 
 

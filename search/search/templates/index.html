@@ -44,6 +44,12 @@
                     <div class="no_results">
                         No search results found!
                     </div>
+                {% else %}
+                    {% if no_empty %}
+                        <div class="no_results">
+                            No search results found!
+                        </div>
+                    {% endif %}
                 {% endif %}
             {% endif %}
         </div>

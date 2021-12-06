@@ -9,9 +9,18 @@ import search
 @search.app.route('/', methods=['GET'])
 def get_search():
     """Display search results based on the query."""
-    query = request.args.get('q', default='', type=str)
+    query = request.args.get('q', type=str)
     weight = request.args.get('w', default=0.5, type=float)
     connection = search.model.get_db()
+    no_empty = None
+    if not query:
+        if query == '':
+            no_empty = True
+        else:
+            no_empty = False
+            query = ''
+    else:
+        no_empty = True
     hit_urls = generate_urls(query, weight)
     threads = []
     for hit_url in hit_urls:
@@ -20,11 +29,10 @@ def get_search():
         thread.start()
     for thread in threads:
         thread.join()
-    config_hit = search.app.config["HIT_CONTEXT_LIST"]
-    print(config_hit)
+    conf_hit = search.app.config["HIT_CONTEXT_LIST"]
     top_ten_docs_info = []
-    for rank, doc_dict in enumerate(
-            heapq.merge(*config_hit, key=lambda x: x["score"], reverse=True)):
+    for rank, doc_dict in enumerate(heapq.merge(
+            *conf_hit, key=lambda x: (x["score"], -x["docid"]), reverse=True)):
         if rank >= 10:
             break
         curr_doc = get_doc_info(doc_dict, connection)
@@ -32,6 +40,7 @@ def get_search():
     search_context = {
         "top_ten_docs": top_ten_docs_info,
         "query": query,
+        "no_empty": no_empty,
         "weight": weight if weight not in (0.0, 1.0)
         else '0' if weight == 0.0 else '1'
     }
