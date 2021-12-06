@@ -28,7 +28,7 @@
             {% if top_ten_docs %}
                 {% for curr_doc in top_ten_docs %}
                     {% if curr_doc.url %}
-                        <a class="doc_url">{{ curr_doc.url }}</a>
+                        <a href="{{curr_doc.url}}" class="doc_url">{{ curr_doc.url }}</a>
                     {% else %}
                         <a class="doc_url">No url available</a>
                     {% endif %}
